@@ -473,6 +473,30 @@ function do_mpd_browse_command ($connection, $command, $arguments, $filter_group
 	return $retarr;
 }
 
+//Builds an array of index letters from the given data.
+function make_index ($data, $dataname) {
+	$letters = array();
+	foreach ($data as $name => $info) {
+		if (is_array ($info))
+			$inf = array_merge (array ($dataname => $name), $info);
+		else
+			$inf = array ($dataname => $info);
+		$letter = strtoupper (mbFirstChar (get_songinfo_first ($inf, isset($configuration["sort"]) ? array_merge ($configuration["sort"], array ($dataname)) : array ($dataname), 0)));
+		if (!isset ($letters[$letter]))
+			$letters[$letter] = true;
+	}
+	return $letters;
+}
+
+//Converts an array from the format returned by do_mpd_command's return_array mode to the format returned by do_mpd_browse_command.
+function convert_mpd_return ($data, $dataname) {
+	$retarr = array ();
+	foreach ($data as $name) {
+		$retarr[$name] = array ($dataname => $name);
+	}
+	return $retarr;
+}
+
 //Returns an array of files matching the given search within the given field.
 // Valid values for $field:
 //  "directory" - return all files within the directory given in $search.
@@ -481,7 +505,7 @@ function do_mpd_browse_command ($connection, $command, $arguments, $filter_group
 //  "album" - return all files matching the album given in $search.
 //  "title" - return all files matching the title given in $search.
 // Set $exact to true if the search should only return exact matches. (only applies to artist and album)
-function get_files ($connection, $field, $search, $exact = false) {
+function get_files ($connection, $field, $search, $exact = true) {
 	switch ($field) {
 	case "directory":
 		return do_mpd_browse_command ($connection, "lsinfo", $search, "file");
@@ -515,12 +539,14 @@ function get_playlists ($connection, $parent = "") {
 
 //Returns an array of instances of the given tag in the database.
 function get_tag ($connection, $tag) {
-	return do_mpd_command ($connection, "list ".$tag, null, true);
+	$tmp = do_mpd_command ($connection, "list ".$tag, null, true);
+	return array (ucwords ($tag) => convert_mpd_return ($tmp[ucwords ($tag)], ucwords ($tag)));
 }
 
 //Returns an array of albums in the database, optionally looking only for albums matching a given artist.
 function get_albums ($connection, $artist = "") {
-	return do_mpd_command ($connection, "list album ".$artist, null, true);
+	$tmp = do_mpd_command ($connection, "list album ".$artist, null, true);
+	return array ("Album" => convert_mpd_return ($tmp["Album"], "Album"));
 }
 
 //Returns an array containing all the songs in the current playlist.
@@ -529,22 +555,33 @@ function get_playlist ($connection) {
 }
 
 //Creates a table for the browser based on a given column definition and dataset.
-function create_browser_table ($columns, $data, $dataname, $name, $title, $nonefoundmessage, $indexarray = array(), $searchterms = array(), $addalllink = false, $startindex = null, $stopindex = null, $hilighttag = null, $hilightmatch = null) {
+function create_browser_table ($columns, $data, $dataname, $name, $title, $nonefoundmessage, $makeindextable = false, $searchterms = array(), $addalllink = false, $startindex = null, $stopindex = null, $hilighttag = null, $hilightmatch = null, $sortdata = false, $customsort = null) {
+	global $configuration;
 	if (is_array ($data) && count ($data) > 0) {
+		if ($sortdata == true) {
+			$sorttmp = $configuration["sort"];
+			if (is_array ($customsort))
+				$configuration["sort"] = $customsort;
+			else
+				array_push ($configuration["sort"], $dataname);
+			uasort ($data, 'sort_song');
+			$configuration["sort"] = $sorttmp;
+		}
+
 		if ($title != "") {
 			echo "<h2><a name=\"".$name."\"></a>".$title;
 			if ($addalllink == true) {
 				echo " <small>[";
 				make_link ("", "playlist", "add all", array("command" => "addall", "tag" => $searchterms["command"], "arg" => $searchterms["arg"]));
 				echo "] ";
-				if (count ($indexarray) > 0) {
-					make_index_table (make_index ($data), $name."_", false);
+				if ($makeindextable == true) {
+					make_index_table (make_index ($data, $dataname), $name."_", false);
 				}
 				echo "</small>";
 			} else {
-				if ($indextable == true) {
+				if ($makeindextable == true) {
 					echo " <small>";
-					make_index_table (make_index ($data), $name."_", false);
+					make_index_table (make_index ($data, $dataname), $name."_", false);
 					echo "</small>";
 				}
 			}
@@ -587,17 +624,23 @@ function create_browser_table ($columns, $data, $dataname, $name, $title, $nonef
 							$target = "status";
 							break;
 						case "add":
+						case "addall":
+						case "addall_recursive":
+						case "addlist":
+						case "upload_playlist":
 						case "delete":
+						case "deleteid":
 						case "load":
 							$target = "playlist";
 							break;
-						case "rm":
-						case "update":
-						case "title":
+						case "directory":
 						case "artist":
 						case "album":
+						case "title":
 						case "genre":
-						case "directory":
+						case "search":
+						case "rm":
+						case "update":
 							$target = "browser";
 						}
 						$cmdarg = format_song_title ($coldef["arg"], $dblockmerged, strval ($rowcount), true);

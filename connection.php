@@ -102,9 +102,12 @@ if(isset($connection) && is_resource($connection)) {
 			break;
 		default:
 			if (array_key_exists ($_REQUEST["command"], $configuration["browsers"])) {
-				//@@@FIXME: Take appropriate action!
-				if (array_key_exists ("arg", $_REQUEST))
+				if (array_key_exists ("tag", $_REQUEST)) {
+					$configuration["tag"] = $_REQUEST["tag"];
+					$configuration["arg"] = $_REQUEST["arg"];
+				} else if (array_key_exists ("arg", $_REQUEST)) {
 					$configuration[$_REQUEST["command"]] = $_REQUEST["arg"];
+				}
 			} else {
 				$command = $_REQUEST["command"];
 				if(array_key_exists("arg", $_REQUEST) && strlen($_REQUEST["arg"])>0) $command.=" \"".$_REQUEST["arg"]."\"";
@@ -126,29 +129,6 @@ if(isset($connection) && is_resource($connection)) {
 			} else {
 				$command_successful = false;
 			}
-	}
-	$files = array();
-	$letters_files = array();
-	if (array_key_exists ("searched", $configuration)) {
-		$ls = do_mpd_command ($connection, $configuration["searched"], null, true);
-	} else {
-		$ls = do_mpd_command($connection, "lsinfo".(array_key_exists("directory", $configuration) ? " \"".$configuration["directory"]."\"" : "" ), null, true);
-	}
-	if (is_array ($ls) && array_key_exists ("file", $ls)) {
-		if (is_array ($ls["file"])) {
-			foreach ($ls["file"] as $key => $file) {
-				$tmp = do_mpd_command($connection, "listallinfo \"".$file."\"", null, true);
-				$files[] = $tmp;
-				if (!isset ($letters_files[strtoupper (mbFirstChar (get_songinfo_first($tmp, isset($configuration["sort"]) ? $configuration["sort"] : array("file"), 0)))]))
-					$letters_files[strtoupper (mbFirstChar (get_songinfo_first($tmp, isset($configuration["sort"]) ? $configuration["sort"] : array("file"), 0)))] = true;
-			}
-		} else {
-			$tmp = do_mpd_command($connection, "listallinfo \"".$ls["file"]."\"", null, true);
-			$files[] = $tmp;
-			$letters_files[strtoupper (mbFirstChar (get_songinfo_first($tmp, isset($configuration["sort"]) ? $configuration["sort"] : array("file"), 0)))] = 1;
-		}
-		$files = array_values($files);
-		usort($files, "sort_song");
 	}
 	$mpd_status = do_mpd_command ($connection, "status", null, true);
 

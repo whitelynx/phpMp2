@@ -11,7 +11,7 @@ img			{ border: none }
 table			{ border: solid 1px #001144; background: #DDFFFF; font: 100% Verdana, sans-serif; width: 100%; margin: 0 }
 tr			{ border-style: solid; background: #EEFFFF; border-width: 1px 0 }
 tr.alt			{ border-style: solid; background: #CCF4F4; border-width: 1px 0 }
-tr.head			{ border-style: solid; background: #B0DDF0; border-width: 1px 0 }
+thead tr			{ border-style: solid; background: #B0DDF0; border-width: 1px 0 }
 td a			{ display: block; width: 100%; height: 100% }
 table.anotfull td a	{ display: inline; width: auto; height: auto }
 td.anotfull a		{ display: inline; width: auto; height: auto }

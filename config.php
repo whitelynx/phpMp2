@@ -11,14 +11,7 @@ $configuration = array(
 	"auto_refresh" => true, //Set to true to cause the status page to automatically refresh every [refresh_freq] seconds.
 	"refresh_freq" => 60, //Number of seconds between auto-refreshes.
 	"use_cookies" => true, //Pretty much has to be true to function correctly. (Don't complain if you get problems setting this to false)
-	"browsers" => array(
-		"directory" => "Browse by Directory",
-		"artist" => "Browse by Artist",
-		"album" => "Browse by Album",
-		"title" => "Browse by Title",
-		"genre" => "Browse by Genre",
-		"search" => "Search database"
-	), //Contains all of the metadata tags that phpmp2 will allow you to browse through. The first one listed is the default, used when none is specified. Special browsers include Directory, which browses through the directory structure of the music database, and Search, which allows you to search the database based on given search terms.
+	"default_browser" => "directory", //The default browser, used when none is specified. (see below for a list of browsers)
 
 // VISUAL STYLE
 	"layout" => "classic", //A directory in the layouts/ directory.
@@ -42,7 +35,7 @@ $configuration = array(
 //		[file] - The filename of the current song.
 //		[directory] - The name of the current directory. (only available in the "directories" column definition)
 //		[playlist] - The name of the current playlist. (only available in the "playlists" column definition)
-	"sort" => array("Artist","Album","Track","Title","file"), //Sort songs according to these fields.
+	"sort" => array ("Title","Artist","Album","Track"), //Sort songs according to these fields.
 	// Valid fields for "sort" are any of the tags in the above list that begin with a capital letter.
 
 	"unknown_string" => "~", //String to show when a column's value is unknown for a certain song/directory.
@@ -57,6 +50,16 @@ $configuration = array(
 	"graphical_sliders" => true,
 
 //////// Don't worry about editing anything below this line unless you know what you're doing. ////////
+	"browsers" => array(
+		"directory" => "Browse by Directory",
+		"artist" => "Browse by Artist",
+		"album" => "Browse by Album",
+		"title" => "Browse by Title",
+		"genre" => "Browse by Genre",
+		"search" => "Search database"
+	), //Contains all of the metadata tags that phpmp2 will allow you to browse through.  Special browsers include Directory, which browses through the directory structure of the music database, and Search, which allows you to search the database based on given search terms.
+	"search_fields" => array ("artist", "album", "title", "genre", "directory", "filename"),
+
 	"columns" => array(
 		"files" => array(
 			"Add" => array(

@@ -25,33 +25,33 @@ a:active .sliderlite	{ border-color: #999999; background: #333333; text-decorati
 h2			{ display: block; width: 100%; font-size: 105%; font-weight: bold; background: #bbbbff; margin-bottom: 0; padding-bottom: 2px; border: solid 1px; border-color: #bbbbff }
 table			{ border: solid 2px #bbbbff; background: #ffffff; font: 100% Verdana, sans-serif; width: 100%; margin: 0; padding: 0 }
 tr			{ border: none; background: #eeeeff; padding: 0; margin: 0 }
-tr.alt td		{ background: #ddddff }
-tr.head td		{ background: #aaaaff }
-td.nobg			{ background: #bbbbff; border-color: #bbbbff }
 td			{ border: none; padding: 1px; margin: 0 }
+tr.alt td		{ background: #ddddff }
+thead tr td		{ background: #aaaaff }
+td.nobg			{ background: #bbbbff; border-color: #bbbbff }
 #playlist h2		{ background: #ffaaaa; border-color: #ffaaaa }
 #playlist table		{ border: solid 2px #ffaaaa; background: #ffffff; font: 100% Verdana, sans-serif; width: 100%; margin: 0; padding: 0 }
 #playlist tr		{ background: #ffdddd }
 #playlist tr.alt td	{ background: #ffeeee }
-#playlist tr.head td	{ background: #ff8888 }
+#playlist thead tr td	{ background: #ff8888 }
 #playlist td.nobg	{ background: #ffaaaa; border-color: #ffaaaa }
 #playlists h2		{ background: #ffaaaa; border-color: #ffaaaa }
 #playlists table	{ border: solid 2px #ffaaaa; background: #ffffff; font: 100% Verdana, sans-serif; width: 100%; margin: 0; padding: 0 }
 #playlists tr		{ background: #ffdddd }
 #playlists tr.alt td	{ background: #ffeeee }
-#playlists tr.head td	{ background: #ff8888 }
+#playlists thead tr td	{ background: #ff8888 }
 #playlists td.nobg	{ background: #ffaaaa; border-color: #ffaaaa }
 #files h2		{ background: #aaffaa; border-color: #aaffaa }
 #files table		{ border: solid 2px #aaffaa; background: #ffffff; font: 100% Verdana, sans-serif; width: 100%; margin: 0; padding: 0 }
 #files tr		{ background: #ccffcc }
 #files tr.alt td	{ background: #eeffee }
-#files tr.head td	{ background: #88ff88 }
+#files thead tr td	{ background: #88ff88 }
 #files td.nobg		{ background: #aaffaa; border-color: #aaffaa }
 #directories h2		{ background: #bbbbff; border-color: #bbbbff }
 #directories table	{ border: solid 2px #bbbbff; background: #ffffff; font: 100% Verdana, sans-serif; width: 100%; margin: 0; padding: 0 }
 #directories tr		{ background: #eeeeff }
 #directories tr.alt td	{ background: #ddddff }
-#directories tr.head td	{ background: #aaaaff }
+#directories thead tr td	{ background: #aaaaff }
 #directories td.nobg	{ background: #bbbbff; border-color: #bbbbff }
 #status h2		{ background: #cccccc; border-color: #cccccc }
 #status table		{ border: solid 2px #eeeeee; background: #eeeeee; font: 100% Verdana, sans-serif; width: 100%; margin: 0; padding: 0 }
