@@ -1,0 +1,61 @@
+phpMp version 2 beta 2
+======================
+
+Description:
+------------
+A web-based client for mpd, written in PHP. (http://www.php.net)
+
+Requirements:
+-------------
+-mpd
+-apache
+-php 4.1 or higher
+-php with gd support for graphical sliders
+
+Installation:
+-------------
+Download phpMp2 and extract into a directory on your webserver:
+
+ $tar xjvf phpmp2-b2.tar.bz2
+
+Alternatively, you can use subversion to get the latest bleeding-edge version:
+
+ $svn checkout https://theory5.chem.pitt.edu/svn/mpd/phpMp2/trunk phpMp2
+
+Edit config.php; This file contains numerous configuration options described in
+the comments in the file.
+
+Usage:
+------
+Surf to the location of the extracted tarball with your web browser.
+
+Credits:
+--------
+phpMp version 1 written by shank
+phpMp version 2 written by nosferat (David H. Bronke)
+
+Contact:
+--------
+Contact us in #mpd on irc.freenode.net.
+
+Bugs:
+-----
+See TODO for information on known bugs that need to be fixed.
+If you find a bug, please contact us by the methods listed above.
+
+Changes:
+--------
+version ?
+-too many changes to list, since there hasn't been a release in ages... now
+ supports streams, playlist uploading, search, sort, browsing by tags, and
+ much more.
+
+version 2b2 -> 2b2r1
+-fixed the crossfade function for newest version of mpd.
+-fixed bug in volume slider in frames layouts.
+
+version 2b1 -> 2b2
+-too many things to remember
+
+version 0.9.1 -> 2b1
+-complete rewrite
