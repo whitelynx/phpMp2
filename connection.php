@@ -30,21 +30,22 @@ if(isset($connection) && is_resource($connection)) {
 	if(array_key_exists("command", $_REQUEST)) {
 		switch($_REQUEST["command"]) {
 		case "addall":
-			$files = array();
-			$command = "add";
-			$ls = do_mpd_command($connection, "lsinfo".(array_key_exists("directory", $configuration) ? " \"".$configuration["directory"]."\"" : "" ), null, true);
-			if(array_key_exists("file", $ls)) {
-				if(is_array($ls["file"])) {
-					foreach($ls["file"] as $key => $file) {
-						$files[] = "\"".$file."\"";
+			if (array_key_exists ("tag", $_REQUEST)) {
+				$ls = do_mpd_browse_command($connection, (array_key_exists("exact", $_REQUEST) && $_REQUEST["exact"] == "true" ? "find " : "search ").$_REQUEST["tag"], array ($_REQUEST["arg"]), "file");
+				if(array_key_exists("file", $ls)) {
+					$files = array();
+					if(is_array($ls["file"])) {
+						foreach($ls["file"] as $file => $fileinfo) {
+							$files[] = "\"".$file."\"";
+						}
+					} else {
+						$files[] = "\"".$ls["file"]."\"";
 					}
-				} else {
-					$files[] = "\"".$ls["file"]."\"";
-				}
-				if(do_mpd_command_list($connection, $command, $files) === true) {
-					$command_successful = true;
-				} else {
-					$command_successful = false;
+					if(do_mpd_command_list($connection, "add", $files) === true) {
+						$command_successful = true;
+					} else {
+						$command_successful = false;
+					}
 				}
 			}
 			break;
@@ -100,12 +101,18 @@ if(isset($connection) && is_resource($connection)) {
 			}
 			break;
 		default:
-			$command = $_REQUEST["command"];
-			if(array_key_exists("arg", $_REQUEST) && strlen($_REQUEST["arg"])>0) $command.=" \"".$_REQUEST["arg"]."\"";
-			if(do_mpd_command($connection, $command) === true) {
-				$command_successful = true;
+			if (array_key_exists ($_REQUEST["command"], $configuration["browsers"])) {
+				//@@@FIXME: Take appropriate action!
+				if (array_key_exists ("arg", $_REQUEST))
+					$configuration[$_REQUEST["command"]] = $_REQUEST["arg"];
 			} else {
-				$command_successful = false;
+				$command = $_REQUEST["command"];
+				if(array_key_exists("arg", $_REQUEST) && strlen($_REQUEST["arg"])>0) $command.=" \"".$_REQUEST["arg"]."\"";
+				if(do_mpd_command($connection, $command) === true) {
+					$command_successful = true;
+				} else {
+					$command_successful = false;
+				}
 			}
 		}
 	}

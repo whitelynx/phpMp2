@@ -3,13 +3,13 @@
 <div id="topbar">
 <table class="nostyle">
 <tr>
-<td class="anotfull">Current&nbsp;Directory:&nbsp;<?php dir_links (array_key_exists("directory", $configuration) ? $configuration["directory"] : "") ?></td>
 <td style="width: 10%"><?php make_link("", "playlist", "Current&nbsp;Playlist", array(), false, null, "playlist") ?></td>
-<td style="width: 10%"><?php make_link("", "search", "Find&nbsp;Songs", array(), false, null, "search") ?></td>
-<td style="width: 10%"><?php make_link("", "files", "Files", array(), false, null, "search") ?></td>
-<td style="width: 10%"><?php make_link("", "directories", "Directories", array(), false, null, "search") ?></td>
-<td style="width: 10%"><?php make_link("", "playlists", "Available&nbsp;Playlists", array(), false, null, "playlists") ?></td>
-<td style="width: 10%"><?php make_link("", "tagfiles", "Browse&nbsp;by&nbsp;ID3", array(), false, null, "tagfiles") ?></td>
+<?php
+foreach ($configuration["browsers"] as $browser => $name ) {
+	echo "<td style=\"width: 10%\">";
+	make_link("", "browser", $name, array("browser" => $browser), false, null, $browser);
+	echo " </td>";
+} ?>
 <td style="width: 10%"><?php make_link ("", "files", "Update", array("command" => "update")) ?></td>
 </tr>
 </table>
@@ -27,10 +27,7 @@
 </div>
 
 <div style="float: left; width: 50%">
-<?php include("search.php"); ?>
-<?php include("files.php"); ?>
-<?php include("directories.php"); ?>
-<?php include("playlists.php"); ?>
+<?php include("browse.php"); ?>
 </div>
 
 </body>

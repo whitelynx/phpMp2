@@ -1,26 +1,27 @@
-phpMp version 2 beta 2
+phpMp2 version 0.11.0
 ======================
 
 Description:
 ------------
-A web-based client for mpd, written in PHP. (http://www.php.net)
+A web-based client for mpd, (http://www.musicpd.org) written in PHP
+(http://www.php.net) as a replacement for phpMp.
 
 Requirements:
 -------------
 -mpd
--apache
+-apache (or other web server that can interpret PHP scripts)
 -php 4.1 or higher
--php with gd support for graphical sliders
+-gd support in php for graphical sliders
 
 Installation:
 -------------
 Download phpMp2 and extract into a directory on your webserver:
 
- $tar xjvf phpmp2-b2.tar.bz2
+ $tar xjvf phpmp2-0.11.0.tar.bz2
 
 Alternatively, you can use subversion to get the latest bleeding-edge version:
 
- $svn checkout https://theory5.chem.pitt.edu/svn/mpd/phpMp2/trunk phpMp2
+ $svn checkout https://svn.musicpd.org/phpMp2/trunk phpMp2
 
 Edit config.php; This file contains numerous configuration options described in
 the comments in the file.
@@ -31,8 +32,8 @@ Surf to the location of the extracted tarball with your web browser.
 
 Credits:
 --------
-phpMp version 1 written by shank
-phpMp version 2 written by nosferat (David H. Bronke)
+phpMp written by shank
+phpMp2 written by nosferat (David H. Bronke)
 
 Contact:
 --------
@@ -45,10 +46,11 @@ If you find a bug, please contact us by the methods listed above.
 
 Changes:
 --------
-version ?
+version 2b2r1 -> 0.11.0 (change in versioning to match MPD)
 -too many changes to list, since there hasn't been a release in ages... now
- supports streams, playlist uploading, search, sort, browsing by tags, and
- much more.
+ supports streams, playlist uploading, search, sort, browsing by tags, playlist
+ IDs, graphical sliders, combined sliders, separate styles and layouts,
+ on-the-fly configuration, and much more.
 
 version 2b2 -> 2b2r1
 -fixed the crossfade function for newest version of mpd.

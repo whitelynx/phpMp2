@@ -1,56 +1,63 @@
 <?php
-//Creates a link to the given URL, with the frame target and content information specified in the current layout's layoutvars.php
+//Creates a link to the given URL, with the frame target and content information specified in the current layout's vars.php
 // under $target, with the given title and arguments. (get-vars)
-function make_link ($url, $target, $title, $arguments = array(), $hilight = false, $picture = null, $anametarget = null) {
+function make_link ($url, $target, $text, $arguments = array(), $hilight = false, $picture = null, $anametarget = null, $title = null, $stdout = true) {
 	global $layout_vars;
+	$output = "";
 	$firstarg = true;
-	echo "<a href=\"".$url;
+	$output .= "<a href=\"".$url;
 	foreach ($arguments as $arg => $value) {
 		if (is_array ($value)) {
 			foreach ($value as $kkey => $vval) {
-				echo ($firstarg ? "?" : "&amp;");
-				echo $arg."[".$kkey."]=".$vval;
+				$output .= ($firstarg ? "?" : "&amp;");
+				$output .= $arg."[".$kkey."]=".$vval;
 				$firstart = false;
 			}
 		} else {
-			echo ($firstarg ? "?" : "&amp;");
-			echo $arg."=".$value;
+			$output .= ($firstarg ? "?" : "&amp;");
+			$output .= $arg."=".$value;
 			$firstarg = false;
 		}
 	}
-	if($target != "") {
-		if($target == "_top") {
-			if($anametarget != null)
-				echo "#".$anametarget;
-			echo "\" target=\"_top";
-		} elseif($target == "_blank") {
-			if($anametarget != null)
-				echo "#".$anametarget;
-			echo "\" target=\"_blank";
-		} elseif(array_key_exists($target, $layout_vars["default_targets"])) {
-			if($firstarg) {
-				echo "?";
+	if ($target != "") {
+		if ($target == "_top") {
+			if ($anametarget != null)
+				$output .= "#".$anametarget;
+			$output .= "\" target=\"_top";
+		} elseif ($target == "_blank") {
+			if ($anametarget != null)
+				$output .= "#".$anametarget;
+			$output .= "\" target=\"_blank";
+		} elseif (array_key_exists($target, $layout_vars["default_targets"])) {
+			if ($firstarg) {
+				$output .= "?";
 				$firstarg = false;
 			} else {
-				echo "&amp;";
+				$output .= "&amp;";
 			}
-			echo "content=".$layout_vars["default_targets"][$target]["content"];
-			if($anametarget != null)
-				echo "#".$anametarget;
-			echo "\"";
-			if ($layout_vars["frames"] == true) echo " target=\"".$layout_vars["default_targets"][$target]["frame"];
+			$output .= "content=".$layout_vars["default_targets"][$target]["content"];
+			if ($anametarget != null)
+				$output .= "#".$anametarget;
+			$output .= "\"";
+			if ($layout_vars["frames"] == true) $output .= " target=\"".$layout_vars["default_targets"][$target]["frame"];
 		}
 	} else {
-		if($anametarget != null)
-			echo "#".$anametarget;
+		if ($anametarget != null)
+			$output .= "#".$anametarget;
 	}
-	if($hilight == true)
-		echo "\" class=\"hilight";
-	if($picture != null) {
-		echo "\"><img src=\"".$picture."\" alt=\"".$title."\" /></a>";
+	if ($hilight == true)
+		$output .= "\" class=\"hilight";
+	if ($title != null)
+		$output .= "\" title=\"".$title;
+	if ($picture != null) {
+		$output .= "\"><img src=\"".$picture."\" alt=\"".$text."\" /></a>";
 	} else {
-		echo "\">".$title."</a>";
+		$output .= "\">".$text."</a>";
 	}
+	if ($stdout == true)
+		echo $output;
+	else
+		return $output;
 }
 
 //Creates entry fields for updating non-boolean configuration values, or for entering streams and such.
@@ -111,20 +118,25 @@ function make_form ($url, $target, $vars = array(), $method = "post", $submitcap
 }
 
 //Creates links to a series of directories, breaking at each "/".
-function dir_links ($dir) {
+function dir_links ($dir, $stdout = true) {
+	$output = "";
 	if (strlen($dir) > 0) {
-		make_link ("", "files", "Music", array ("directory" => ""));
+		$output .= make_link ("", "browser", "Music", array ("directory" => ""), false, null, null, null, false);
 		$bit = strtok ($dir, "/");
 		$cdir = $bit;
 		while ($bit) {
-			echo " / ";
-			make_link ("", "files", $bit, array ("directory" => $cdir));
+			$output .= " / ";
+			$output .= make_link ("", "browser", $bit, array ("directory" => $cdir), false, null, null, null, false);
 			$bit = strtok ("/");
 			$cdir = $cdir."/".$bit;
 		}
 	} else {
-		make_link ("", "files", "Music", array ("directory" => ""));
+		$output .= make_link ("", "browser", "Music", array ("directory" => ""), false, null, null, null, false);
 	}
+	if ($stdout == true)
+		echo $output;
+	else
+		return $output;
 }
 
 //Loads configuration variables from cookies.
@@ -160,44 +172,67 @@ function eat_config_cookie($key) {
 
 //Parses information returned by mpd.
 function parse_mpd_var($in_str) {
+	global $mpd_version;
 	$got = trim($in_str);
 	if(!isset($got))
 		return null;
-	if(strncmp("OK", $got,strlen("OK"))==0) 
+	switch(strtok($got, " ")) {
+	case "OK": 
+		if(strtok(" ") == MPD)
+			$mpd_version = strtok(" ");
 		return true;
-	if(strncmp("ACK", $got,strlen("ACK"))==0) {
+	case "ACK":
 		str_replace("\n", "\n<br />", $got);
 		print $got."<br />";
 		return true;
+	default:
+		$key = trim(strtok($got, ":"));
+		$val = trim(strtok("\0"));
+		return array(0 => $key, 1 => $val);
 	}
-	$key = trim(strtok($got, ":"));
-	$val = trim(strtok("\0"));
-	return array(0 => $key, 1 => $val);
 }
 
 //Sends a command to mpd and parses the results.
-function do_mpd_command($conn, $command, $varname = null, $return_array = false) {
+function do_mpd_command($conn, $command, $varname = null, $return_array = false, $groupbycase = false) {
 	$retarr = array();
+	global $tags;
+	global $letters_tags;
 	fputs($conn, $command."\n");
 	while(!feof($conn)) {
 		$var = parse_mpd_var(fgets($conn, 1024));
 		if(isset($var)){
-			if($var === true && count($retarr) == 0)
-				return true;
-			if($var === true)
-				break;
+			if($var === true) {
+				if (count($retarr) == 0)
+					return true;
+				else
+					break;
+			}
 			if(isset($varname) && strcmp($var[0], $varname)) {
 				return $var[1];
 			} elseif($return_array == true) {
-				if(array_key_exists($var[0], $retarr)) {
-					if(is_array($retarr[($var[0])])) {
-						array_push($retarr[($var[0])], $var[1]);
+				if($groupbycase == true) {
+					if(substr($var[0], 0, 1) == strtolower(substr($var[0], 0, 1))) {
+						if(array_key_exists($var[0], $retarr)) {
+							$retarr[($var[0])][($var[1])] = array();
+						} else {
+							$retarr[($var[0])] = array($var[1] => array());
+						}
+						$lastgroupname = $var[0];
+						$lastitemname = $var[1];
 					} else {
-						$tmp = $retarr[($var[0])];
-						$retarr[($var[0])] = array($tmp, $var[1]);
+						$retarr[$lastgroupname][$lastitemname][($var[0])] = $var[1];
 					}
 				} else {
-					$retarr[($var[0])] = $var[1];
+					if(array_key_exists($var[0], $retarr)) {
+						if(is_array($retarr[($var[0])])) {
+							array_push($retarr[($var[0])], $var[1]);
+						} else {
+							$tmp = $retarr[($var[0])];
+							$retarr[($var[0])] = array($tmp, $var[1]);
+						}
+					} else {
+						$retarr[($var[0])] = $var[1];
+					}
 				}
 			}
 		}
@@ -245,8 +280,16 @@ function create_slider($current, $min, $max, $length, $var, $intonly = false) {
 	}
 }
 
+//Formats a time given in seconds.
+function format_time($seconds) {
+	$hrs = intval($seconds/(60*60));
+	$min = intval($seconds/60) - ($hrs * 60);
+	$sec = $seconds - ($min * 60) - ($hrs * 60 * 60);
+	return ($hrs > 0 ? strval($hrs).":".str_pad(strval($min), 2, "0", STR_PAD_LEFT) : strval($min)).":".str_pad(strval($sec), 2, "0", STR_PAD_LEFT);
+}
+
 //Returns a song title string formatted according to $format (see config.php) derived from the information in $songinfo.
-function format_song_title($format, $songinfo, $number = null) {
+function format_song_title($format, $songinfo, $number = null, $strict = false) {
 	global $configuration;
 	$output = $format;
 	$tags = explode("[", $output);
@@ -254,34 +297,56 @@ function format_song_title($format, $songinfo, $number = null) {
 		foreach($tags as $key => $tag_raw) {
 			$tag = substr($tag_raw, 0, strpos($tag_raw, "]"));
 			if(strlen($tag) > 0) {
-				switch($tag) {
-				case "Number":
+				$replace = null;
+				if ($tag == "Number") {
 					if($number != null) {
 						$replace = $number;
 					} else {
-						$replace = null;
+						$replace = "";
 					}
-					break;
-				case "Title":
-					$replace = (array_key_exists($tag, $songinfo) ? htmlspecialchars($songinfo[$tag]) : ($configuration["filenames_replace_underscores"] ? str_replace('_',' ', htmlspecialchars($songinfo["file"])) : htmlspecialchars($songinfo["file"])));
-					break;
-				default:
-					$replace = (array_key_exists($tag, $songinfo) ? htmlspecialchars($songinfo[$tag]) : $configuration["unknown_string"]);
+				} else if (array_key_exists ($tag, $songinfo)) {
+					switch($tag) {
+					case "Title":
+						$replace = htmlspecialchars($songinfo[$tag]);
+						break;
+					case "Time":
+						$replace = format_time ($songinfo[$tag]);
+						break;
+					case "directory":
+					case "playlist":
+					case "file":
+						$replace = htmlspecialchars ($songinfo[$tag]);
+						if ($configuration["filenames_strip_directory"] == true)
+							$replace = basename ($replace);
+						if ($configuration["filenames_replace_underscores"] == true)
+							$replace = str_replace ('_',' ', $replace);
+						break;
+					default:
+						$replace = htmlspecialchars($songinfo[$tag]);
+					}
+				} else if (substr ($tag, -7) == "literal") {
+					$replace = htmlspecialchars ($songinfo[substr ($tag, 0, -7)]);
+				} else if ($tag == "Titlefile") {
+					if (array_key_exists ("Title", $songinfo)) {
+						$replace = htmlspecialchars($songinfo["Title"]);
+					} else {
+						$replace = htmlspecialchars ($songinfo["file"]);
+						if ($configuration["filenames_strip_directory"] == true)
+							$replace = basename ($replace);
+						if ($configuration["filenames_replace_underscores"] == true)
+							$replace = str_replace ('_',' ', $replace);
+					}
 				}
-				if($replace != null)
+				if($replace !== null)
 					$output = str_replace("[".$tag."]", $replace, $output);
+				else if ($strict == true)
+					return false;
+				else
+					$output = str_replace ("[".$tag."]", $configuration["unknown_string"], $output);
 			}
 		}
 	}
 	return $output;
-}
-
-//Formats a time given in seconds.
-function format_time($seconds) {
-	$hrs = intval($seconds/(60*60));
-	$min = intval($seconds/60) - ($hrs * 60);
-	$sec = $seconds - ($min * 60) - ($hrs * 60 * 60);
-	return ($hrs > 0 ? strval($hrs).":".str_pad(strval($min), 2, "0", STR_PAD_LEFT) : strval($min)).":".str_pad(strval($sec), 2, "0", STR_PAD_LEFT);
 }
 
 //Makes a table of index letters.
@@ -361,6 +426,197 @@ function get_songinfo_first ($info, $sort_history, $depth) {
 		}
 	} else {
 		return "";
+	}
+}
+
+//Performs an MPD command and parses the output as a browsing response.
+function do_mpd_browse_command ($connection, $command, $arguments, $filter_group = "") {
+	$retarr = array();
+	if (is_array ($arguments)) {
+		$args = $arguments;
+	} else {
+		$args = array ($arguments);
+	}
+	foreach ($args as $arg) {
+		$skip_group = false;
+		fputs($connection, $command." \"".$arg."\"\n");
+		while(!feof($connection)) {
+			$var = parse_mpd_var(fgets($connection, 1024));
+			if(isset($var)){
+				if($var === true) {
+					if (count($retarr) == 0)
+						return true;
+					else
+						break;
+				}
+				if (substr ($var[0], 0, 1) == strtolower (substr ($var[0], 0, 1))) {
+					//tag's first letter is lowercase; this is the start of a new response group.
+					$groupname = $var[0];
+					$itemname = $var[1];
+					if ($filter_group == "" || $groupname == $filter_group) {
+						$skip_group = false;
+						if (array_key_exists ($groupname, $retarr)) {
+							$retarr[$groupname][$itemname] = array ();
+						} else {
+							$retarr[$groupname] = array ($itemname => array ());
+						}
+					} else {
+						$skip_group = true;
+					}
+				} else if ($skip_group != true) {
+					//tag's first letter is uppercase; add this to the current group.
+					$retarr[$groupname][$itemname][($var[0])] = $var[1];
+				}
+			}
+		}
+	}
+	return $retarr;
+}
+
+//Returns an array of files matching the given search within the given field.
+// Valid values for $field:
+//  "directory" - return all files within the directory given in $search.
+//  "files" - return all files listed within $search (passed as a comma-separated list) that exist in the database.
+//  "artist" - return all files matching the artist given in $search.
+//  "album" - return all files matching the album given in $search.
+//  "title" - return all files matching the title given in $search.
+// Set $exact to true if the search should only return exact matches. (only applies to artist and album)
+function get_files ($connection, $field, $search, $exact = false) {
+	switch ($field) {
+	case "directory":
+		return do_mpd_browse_command ($connection, "lsinfo", $search, "file");
+	case "files":
+	case "filename":
+		$filenames = explode (",", $search);
+		$files = array ();
+		return do_mpd_browse_command ($connection, "search filename", $filenames, "file");
+	case "artist":
+	case "album":
+	case "title":
+	case "genre":
+		if ($exact == true) {
+			return do_mpd_browse_command ($connection, "find ".$field, $search, "file");
+		}
+		return do_mpd_browse_command ($connection, "search ".$field, $search, "file");
+	default:
+		return $files;
+	}
+}
+
+//Returns a list of subdirectories of the given directory. The directory defaults to the root of the database.
+function get_directories ($connection, $parent = "") {
+	return do_mpd_browse_command ($connection, "lsinfo", $parent, "directory");
+}
+
+//Returns an array of available playlists in the given directory. The directory defaults to the root of the database.
+function get_playlists ($connection, $parent = "") {
+	return do_mpd_browse_command ($connection, "lsinfo", $parent, "playlist");
+}
+
+//Returns an array of instances of the given tag in the database.
+function get_tag ($connection, $tag) {
+	return do_mpd_command ($connection, "list ".$tag, null, true);
+}
+
+//Returns an array of albums in the database, optionally looking only for albums matching a given artist.
+function get_albums ($connection, $artist = "") {
+	return do_mpd_command ($connection, "list album ".$artist, null, true);
+}
+
+//Returns an array containing all the songs in the current playlist.
+function get_playlist ($connection) {
+	return do_mpd_browse_command ($connection, "playlistinfo", null, "file");
+}
+
+//Creates a table for the browser based on a given column definition and dataset.
+function create_browser_table ($columns, $data, $dataname, $name, $title, $nonefoundmessage, $indexarray = array(), $searchterms = array(), $addalllink = false, $startindex = null, $stopindex = null, $hilighttag = null, $hilightmatch = null) {
+	if (is_array ($data) && count ($data) > 0) {
+		if ($title != "") {
+			echo "<h2><a name=\"".$name."\"></a>".$title;
+			if ($addalllink == true) {
+				echo " <small>[";
+				make_link ("", "playlist", "add all", array("command" => "addall", "tag" => $searchterms["command"], "arg" => $searchterms["arg"]));
+				echo "] ";
+				if (count ($indexarray) > 0) {
+					make_index_table (make_index ($data), $name."_", false);
+				}
+				echo "</small>";
+			} else {
+				if ($indextable == true) {
+					echo " <small>";
+					make_index_table (make_index ($data), $name."_", false);
+					echo "</small>";
+				}
+			}
+			echo "</h2>\n";
+		}
+
+		echo "<table cellspacing=\"0\">\n<thead><tr>";
+		foreach ($columns as $coltitle => $coldef) {
+			echo "<td".($coldef["shrink"] == true ? " style=\"width: ".strlen ($coltitle)."em\"" : "").">";
+			if (array_key_exists ("sort", $coldef))
+				make_link ("", $name, $coltitle, array ("sort" => $coldef["sort"]));
+			else
+				echo $coltitle;
+			echo "</td>";
+		}
+		echo "</tr></thead>\n<tbody>";
+
+		$rowcount = 0;
+
+		foreach ($data as $dbname => $dblock) {
+			if ($startindex == null || ($startindex <= $rowcount && $rowcount <= $stopindex)) {
+				if (is_array ($dblock)) {
+					$dblockmerged = array_merge (array ($dataname => $dbname), $dblock);
+				} else {
+					$dblockmerged = array ($dataname => $dblock);
+				}
+				echo "<tr";
+				if ($hilighttag != null && $dblockmerged[$hilighttag] == $hilightmatch)
+					echo " class=\"hilight\"";
+				else if ($rowcount % 2 != 1)
+					echo " class=\"alt\"";
+				echo ">";
+				foreach ($columns as $coltitle => $coldef) {
+					echo "<td>";
+					if (array_key_exists ("command", $coldef)) {
+						$target = "";
+						switch ($coldef["command"]) {
+						case "play":
+						case "playid":
+							$target = "status";
+							break;
+						case "add":
+						case "delete":
+						case "load":
+							$target = "playlist";
+							break;
+						case "rm":
+						case "update":
+						case "title":
+						case "artist":
+						case "album":
+						case "genre":
+						case "directory":
+							$target = "browser";
+						}
+						$cmdarg = format_song_title ($coldef["arg"], $dblockmerged, strval ($rowcount), true);
+						if ($cmdarg !== false)
+							make_link ("", $target, format_song_title ($coldef["text"], $dblockmerged, strval ($rowcount)), array ("command" => $coldef["command"], "arg" => $cmdarg), false, null, null, (array_key_exists ("tooltip", $coldef) ? $coldef["tooltip"] : null));
+						else
+							echo $configuration["unknown_string"];
+					} else {
+						echo format_song_title ($coldef["text"], $dblockmerged, strval ($rowcount));
+					}
+					echo "</td>\n";
+				}
+				echo "</tr>\n";
+			}
+			$rowcount++;
+		}
+		echo "</tbody>\n</table>\n";
+	} else {
+		echo $nonefoundmessage."\n";
 	}
 }
 ?>

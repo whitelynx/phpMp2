@@ -24,7 +24,7 @@ if((array_key_exists("command", $_REQUEST) && $_REQUEST["command"])) {
 switch($mpd_status["state"]) {
 case "play":
 case "pause":
-	$songinfo = do_mpd_command($connection, "playlistinfo ".$mpd_status["song"], null, true);
+	$songinfo = do_mpd_command($connection, "playlistid ".$mpd_status["songid"], null, true);
 	if($configuration["filenames_only"] == true) {
 		echo $songinfo["file"];
 	} else {

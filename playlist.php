@@ -44,72 +44,9 @@ if($configuration["playlist_lines"] < $mpd_status["playlistlength"] && $playlist
 	echo "</tr></table>";
 }
 
-echo "<table cellspacing=\"0\">\n<tr class=\"head\">";
-foreach($configuration["columns_playlist"] as $key => $column) {
-	switch ($column) {
-	case "Function":
-		//echo "<td>".$configuration["delete"]."</td>";
-		echo "<td></td>";
-		break;
-	case "Number":
-		echo "<td>#</td>";
-		break;
-	case "songformat":
-		echo "<td>Song</td>";
-		break;
-	default:
-		echo "<td>".$column."</td>";
-	}
-}
-echo "</tr>\n";
-
-for($counte = intval($playlist_start); $counte < $playlist_end; $counte++) {
-	$songinfo = do_mpd_command($connection, "playlistinfo ".$counte, null, true);
-	echo "<tr";
-	if(array_key_exists("song", $mpd_status) && $counte == $mpd_status["song"]) {
-		echo " class=\"hilight\"";
-	} else if($counte % 2 != 1) {
-		echo " class=\"alt\"";
-	}
-	echo ">";
-	foreach($configuration["columns_playlist"] as $key => $column) {
-		if(array_key_exists($column, $songinfo) && strlen($songinfo[$column]) > 0) {
-			echo "<td>";
-			switch($column) {
-			case "Title":
-				make_link("", "status", htmlspecialchars($songinfo[$column]), array("command" => "play", "arg" => $counte));
-				break;
-			case "Time":
-				echo format_time($songinfo[$column]);
-				break;
-			default:
-				echo $songinfo[$column];
-			}
-			echo "</td>";
-		} else {
-			echo "<td>";
-			switch($column) {
-			case "Title":
-				make_link("", "status", htmlspecialchars($songinfo["file"]), array("command" => "play", "arg" => $counte));
-				break;
-			case "Function":
-				make_link("", "playlist", $configuration["delete"], array("command" => "delete", "arg" => $counte));
-				break;
-			case "Number":
-				echo $counte;
-				break;
-			case "songformat":
-				make_link("", "status", format_song_title($configuration["song_display_format"], $songinfo, strval($counte)), array("command" => "play", "arg" => $counte));
-				break;
-			default:
-				echo $configuration["unknown_string"];
-			}
-			echo "</td>";
-		}
-	}
-	echo "</tr>\n";
-}
-echo "</table>\n";
+$pl_letters = array();
+$pl = get_playlist ($connection);
+create_browser_table ($configuration["columns"]["playlist"], $pl["file"], "file", "playlist", "", "No songs in playlist!", $pl_letters, array(), false, $playlist_start, $playlist_end, "Id", $mpd_status["songid"]);
 
 if($configuration["playlist_lines"] < $mpd_status["playlistlength"] && $playlist_end < $mpd_status["playlistlength"]) {
 	echo "<table cellspacing=\"0\" class=\"nostyle\" style=\"text-align: center\"><tr>";

@@ -1,6 +1,17 @@
 <?php
 load_config_cookies ($_COOKIE);
 
+if (array_key_exists ("browser", $_REQUEST)) {
+	make_config_cookie ("browser", $_REQUEST["browser"]);
+	$configuration["browser"] = $_REQUEST["browser"];
+	eat_config_cookie ("artist");
+	eat_config_cookie ("album");
+	eat_config_cookie ("title");
+	eat_config_cookie ("genre");
+	eat_config_cookie ("directory");
+	eat_config_cookie ("filename");
+}
+
 if (array_key_exists ("directory", $_REQUEST)) {
 	make_config_cookie ("directory", $_REQUEST["directory"]);
 	$configuration["directory"] = $_REQUEST["directory"];
@@ -24,31 +35,14 @@ if (array_key_exists ("search", $_REQUEST)) {
 		unset ($configuration["directory"]);
 }
 
-if (array_key_exists ("artist", $_REQUEST)) {
-	if ($_REQUEST["artist"] != "") {
-		make_config_cookie ("artist", $_REQUEST["artist"]);
-		$configuration["artist"] = $_REQUEST["artist"];
-		eat_config_cookie ("album");
-		if (array_key_exists ("album", $configuration))
-			unset ($configuration["album"]);
+if (array_key_exists ("tag", $_REQUEST)) {
+	if ($_REQUEST["tag"] != "") {
+		make_config_cookie("tag", $_REQUEST["tag"]);
+		$configuration["tag"] = $_REQUEST["tag"];
 	} else {
-		eat_config_cookie ("artist");
-		if (array_key_exists ("artist", $configuration))
-			unset ($configuration["artist"]);
-		eat_config_cookie ("album");
-		if (array_key_exists ("album", $configuration))
-			unset ($configuration["album"]);
-	}
-}
-
-if (array_key_exists ("album", $_REQUEST)) {
-	if ($_REQUEST["album"] != "") {
-		make_config_cookie("album", $_REQUEST["album"]);
-		$configuration["album"] = $_REQUEST["album"];
-	} else {
-		eat_config_cookie("album");
-		if (array_key_exists ("album", $configuration))
-			unset ($configuration["album"]);
+		eat_config_cookie("tag");
+		if (array_key_exists ("tag", $configuration))
+			unset ($configuration["tag"]);
 	}
 }
 
@@ -90,9 +84,6 @@ $allowable = array(
 	"display_volume" => "bool",
 	"display_crossfade" => "bool"
 );
-echo "<!--\n";
-print_r($_REQUEST);
-echo "-->\n";
 
 foreach($_REQUEST as $var => $value) {
 	if(array_key_exists($var, $allowable)) {
@@ -111,9 +102,6 @@ foreach($_REQUEST as $var => $value) {
 }
 
 if (array_key_exists ("form_vars", $_REQUEST)) {
-	echo "<!--\n";
-	print_r($_REQUEST);
-	echo "-->\n";
 	foreach($_REQUEST["form_vars"] as $num => $var) {
 		if(array_key_exists($var, $allowable)) {
 			switch($allowable[$var]) {

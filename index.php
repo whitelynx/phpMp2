@@ -48,7 +48,7 @@ ob_end_flush();
 <html>
 
 <head>
-<title><?php echo $configuration["title"]; ?></title>
+<title><?php echo $configuration["page_title"]; ?></title>
 <meta http-equiv="Expires" content="Thu, 01 Dec 1994 16:00:00 GMT" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
