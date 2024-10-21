@@ -1,10 +1,10 @@
 phpMp2
 ======
 
-Description:
-------------
 A web-based client for [mpd](http://www.musicpd.org), written in
 [PHP](http://www.php.net) as a replacement for phpMp.
+
+![phpMp2 sceenshot](screenshot.png "phpMp2 screenshot")
 
 Requirements:
 -------------
