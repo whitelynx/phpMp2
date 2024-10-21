@@ -439,7 +439,11 @@ function do_mpd_browse_command ($connection, $command, $arguments, $filter_group
 	}
 	foreach ($args as $arg) {
 		$skip_group = false;
-		fputs($connection, $command." \"".$arg."\"\n");
+		if (is_null ($arg)) {
+			fputs($connection, $command."\n");
+		} else {
+			fputs($connection, $command." \"".$arg."\"\n");
+		}
 		while(!feof($connection)) {
 			$var = parse_mpd_var(fgets($connection, 1024));
 			if(isset($var)){
