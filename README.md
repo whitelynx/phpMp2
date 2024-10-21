@@ -1,23 +1,23 @@
 phpMp2
 ======
 
-A web-based client for [mpd](http://www.musicpd.org), written in
-[PHP](http://www.php.net) as a replacement for phpMp.
+A web-based client for [MPD][], written in [PHP][] as a replacement for phpMp.
 
 ![phpMp2 sceenshot](screenshot.png "phpMp2 screenshot")
 
 Requirements:
 -------------
-- mpd
-- apache _(or any HTTP server of your choce that can run PHP)_
-- php 4.1 or higher _(though I wouldn't use too new a version, since this is a vey old project)_
-- gd support in php for graphical sliders
+- [MPD][] or [Mopidy][]
+- nginx _(or any HTTP server of your choce that can run PHP)_
+- [PHP][] 4.1 or higher _(though I wouldn't use too new a version, since this
+  is a vey old project; this has been tested on PHP 5.6)_
+- GD support in PHP for graphical sliders
 
 Installation:
 -------------
 Download phpMp2 and extract into a directory on your webserver:
 
-    tar xjvf phpMp2-0.12.0-rc1.tar.gz
+    tar xjvf phpMp2-0.12.0-rc2.tar.gz
 
 Alternatively, you can use git to get the latest bleeding-edge version:
 
@@ -32,7 +32,8 @@ Surf to the location of the extracted tarball with your web browser.
 
 Testing:
 --------
-You can use the provided `docker-compose.yml` to run [Mopidy]() and phpMp2 in [Docker]().
+You can use the provided `docker-compose.yml` to run
+[Mopidy][] and phpMp2 in [Docker](https://www.docker.com/).
 
 Before running, create the `media` and `local` directories:
 ```bash
@@ -59,7 +60,8 @@ Finally, you can browse to <http://localhost:80> to use phpMp2.
 Credits:
 --------
 - phpMp written by Warren Dukes (shank)
-- phpMp2 written by David H. Bronke ([whitelynx](https://github.com/whitelynx); formerly nosferat)
+- phpMp2 written by David H. Bronke ([whitelynx](https://github.com/whitelynx);
+  formerly nosferat)
 
 Bugs:
 -----
@@ -89,3 +91,8 @@ version 2b1 -> 2b2
 
 version 0.9.1 -> 2b1
 - complete rewrite
+
+
+[MPD]: https://musicpd.org/
+[Mopidy]: https://mopidy.com/
+[PHP]: https://www.php.net/
