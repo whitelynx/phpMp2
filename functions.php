@@ -177,8 +177,8 @@ function parse_mpd_var($in_str) {
 	if(!isset($got))
 		return null;
 	switch(strtok($got, " ")) {
-	case "OK": 
-		if(strtok(" ") == MPD)
+	case "OK":
+		if(strtok(" ") == "MPD")
 			$mpd_version = strtok(" ");
 		return true;
 	case "ACK":
