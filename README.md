@@ -30,6 +30,32 @@ Usage:
 ------
 Surf to the location of the extracted tarball with your web browser.
 
+Testing:
+--------
+You can use the provided `docker-compose.yml` to run [Mopidy]() and phpMp2 in [Docker]().
+
+Before running, create the `media` and `local` directories:
+```bash
+mkdir media local
+```
+
+You can place media files in the `media` directory and then index it with the `wernight/mopidy` image:
+```bash
+docker run --rm \
+    --device /dev/snd --user 105:100 \
+    -v "$PWD/media:/var/lib/mopidy/media:ro" \
+    -v "$PWD/local:/var/lib/mopidy/local" \
+    -p 6680:6680 \
+    wernight/mopidy mopidy local scan
+```
+
+Next, bring up the Docker Compose stack:
+```bash
+docker compose up
+```
+
+Finally, you can browse to <http://localhost:80> to use phpMp2.
+
 Credits:
 --------
 - phpMp written by Warren Dukes (shank)
