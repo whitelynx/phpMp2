@@ -1,4 +1,6 @@
 <?php
+echo "<style type=\"text/css\" media=\"screen\">\n<!--\nhtml { background: #000000 }\n-->\n</style>\n";
+
 function style_button($name) {
 	global $mpd_status;
 	switch($name) {
