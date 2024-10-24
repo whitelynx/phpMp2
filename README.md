@@ -1,19 +1,34 @@
 phpMp2
 ======
 
-A web-based client for [MPD][], written in [PHP][] as a replacement for phpMp.
+A web-based client for [MPD][] or [Mopidy][], written in [PHP][] as a replacement for phpMp.
 
 ![phpMp2 sceenshot](screenshot.png "phpMp2 screenshot")
 
-Requirements:
--------------
+A note from the author:
+-----------------------
+First, some history: This client was originally written in 2004-2005 by me,
+[David H. Bronke](https://github.com/whitelynx), and was lost for many years because of lack of maintenance and
+migration of the MPD codebase. I recently (late 2024) discovered a set of my backups that included 3 of the original
+phpMp2 releases, and I decided to import them into Git and push the result to GitHub.
+
+I figured I'd try out this 20-year-old project since I was releasing it to the public again, and it turns out it
+**still works!** Even after upgrading to the latest versions of MPD and PHP (and even when trying Mopidy), the client
+is still functional, only needing some minor bugfixes and quality of life improvements - most notably, a couple of new
+Docker Compose stacks to make local use easier.
+
+It's surprising and gratifying to see one of my earliest [open source](COPYING) projects still usable!
+
+Using your own HTTP server and MPD/Mopidy server:
+-------------------------------------------------
+
+### Requirements:
 - [MPD][] or [Mopidy][]
 - nginx _(or any HTTP server of your choice that can run PHP)_
 - [PHP][] 4.1 or higher
 - GD support in PHP for graphical sliders
 
-Installation:
--------------
+### Setup:
 Download phpMp2 and extract into a directory on your webserver:
 
     tar xjvf phpMp2-0.12.0-rc2.tar.gz
@@ -25,38 +40,58 @@ Alternatively, you can use git to get the latest bleeding-edge version:
 Edit `config.php`; This file contains numerous configuration options described
 in the comments in the file.
 
-Usage:
-------
 Surf to the location of the extracted tarball with your web browser.
 
-Testing:
---------
+Using all-in-one MPD stack:
+---------------------------
 You can use the provided `docker-compose.yml` to run
-[Mopidy][] and phpMp2 in [Docker](https://www.docker.com/).
+[MPD][] and phpMp2 in [Docker](https://www.docker.com/).
 
-Before running, create the `media` and `local` directories:
+Before running, create the `mpd-data/config`, `mpd-data/music`, and `mpd-data/playlists` directories:
 ```bash
-mkdir media local
+mkdir -p mpd-data/{config,music,playlists}
 ```
 
-You can place media files in the `media` directory and then index it with the `wernight/mopidy` image:
-```bash
-docker run --rm \
-    --device /dev/snd --user 105:100 \
-    -v "$PWD/media:/var/lib/mopidy/media:ro" \
-    -v "$PWD/local:/var/lib/mopidy/local" \
-    -p 6680:6680 \
-    wernight/mopidy mopidy local scan
-```
+You can place media files in the `mpd-data/music` directory.
 
-Edit `config.php`, and change the `mpd_host` setting to `mopidy-1`.
+Edit `config.php`, and change the `mpd_host` setting to `mpd-1`.
 
 Next, bring up the Docker Compose stack:
 ```bash
 docker compose up
 ```
 
-Finally, you can browse to <http://localhost:80> to use phpMp2.
+Finally, you can browse to <http://localhost:7080> to use phpMp2.
+
+Using all-in-one Mopidy stack:
+------------------------------
+You can use the provided `docker-compose-mopidy.yml` to run
+[Mopidy][] and phpMp2 in [Docker](https://www.docker.com/).
+
+Before running, create the `mopidy-data/media`, `mopidy-data/local`, and `mopidy-data/playlists` directories:
+```bash
+mkdir -p mopidy-data/{media,local,playlists}
+```
+
+You can place media files in the `mopidy-data/media` directory and then index it with the `wernight/mopidy` image:
+```bash
+docker run --rm \
+    --device /dev/snd --user 105:100 \
+    -v "$PWD/mopidy-data/media:/var/lib/mopidy/media:ro" \
+    -v "$PWD/mopidy-data/local:/var/lib/mopidy/local" \
+    -v "$PWD/mopidy-data/playlits:/var/lib/mopidy/playlits" \
+    -p 6680:6680 \
+    wernight/mopidy mopidy local scan
+```
+
+Edit `config.php`, and change the `mpd_host` setting to `mpd-1`.
+
+Next, bring up the Docker Compose stack:
+```bash
+docker compose -f docker-compose-mopidy.yml up
+```
+
+Finally, you can browse to <http://localhost:7080> to use phpMp2.
 
 Credits:
 --------
