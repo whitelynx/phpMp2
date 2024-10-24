@@ -10,7 +10,7 @@ services:
       - "$PWD/media:/var/lib/mopidy/media:ro"
       - "$PWD/local:/var/lib/mopidy/local"
   web:
-    image: shinsenter/phpfpm-nginx:php5.6
+    image: shinsenter/phpfpm-nginx:php8-alpine
     environment:
       APP_UID: "$UID"
       APP_GID: "100"
