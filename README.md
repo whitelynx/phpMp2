@@ -8,9 +8,8 @@ A web-based client for [MPD][], written in [PHP][] as a replacement for phpMp.
 Requirements:
 -------------
 - [MPD][] or [Mopidy][]
-- nginx _(or any HTTP server of your choce that can run PHP)_
-- [PHP][] 4.1 or higher _(though I wouldn't use too new a version, since this
-  is a vey old project; this has been tested on PHP 5.6)_
+- nginx _(or any HTTP server of your choice that can run PHP)_
+- [PHP][] 4.1 or higher
 - GD support in PHP for graphical sliders
 
 Installation:
