@@ -50,6 +50,8 @@ docker run --rm \
     wernight/mopidy mopidy local scan
 ```
 
+Edit `config.php`, and change the `mpd_host` setting to `mopidy-1`.
+
 Next, bring up the Docker Compose stack:
 ```bash
 docker compose up
