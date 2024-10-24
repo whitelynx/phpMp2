@@ -1,24 +1,27 @@
 services:
-  mopidy:
-    image: wernight/mopidy:latest
+  mpd:
+    image: gists/mpd
     ports:
       - "6600:6600"
-      - "6680:6680"
-    user: "105:100"
+      - "8000:8000"
+    environment:
+      PULSE_SERVER: "unix:/run/user/100/pulse/native"
     volumes:
-      - "/run/user/$UID/pulse:/run/user/105/pulse"
-      - "$PWD/media:/var/lib/mopidy/media:ro"
-      - "$PWD/local:/var/lib/mopidy/local"
+      - "/run/user/$UID/pulse:/run/user/100/pulse"
+      - "./mpd-data/mpd.conf:/etc/mpd.conf"
+      - "./mpd-data/music:/music"
+      - "./mpd-data/playlists:/var/lib/mpd/playlists"
+    command: [ "sh", "-c", "chown 100:100 /run/user/100/*; mpd --stdout --no-daemon" ]
+    restart: unless-stopped
   web:
     image: shinsenter/phpfpm-nginx:php8-alpine
     environment:
       APP_UID: "$UID"
       APP_GID: "100"
     links:
-      - mopidy
+      - mpd
     ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
+      - "7080:80"
     volumes:
       - .:/var/www/html
+    restart: unless-stopped
