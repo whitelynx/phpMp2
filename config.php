@@ -94,13 +94,13 @@ $configuration = array(
 			"Add" => array(
 				"text" => "add",
 				"command" => "add",
-				"arg" => "[fileliteral]",
+				"arg" => "[fileliteral|directoryliteral]",
 				"shrink" => true
 			),
 			"Update" => array(
 				"text" => "update",
 				"command" => "update",
-				"arg" => "[fileliteral]",
+				"arg" => "[fileliteral|directoryliteral]",
 				"shrink" => true
 			),
 			"Directory" => array(
