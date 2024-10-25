@@ -1,6 +1,7 @@
 <?php
 $is_connected = false;
 $authorized = false;
+$command_successful = null;
 
 if($configuration["use_cookies"]==true) {
 	if(isset($configuration["hide"])) {
@@ -108,6 +109,7 @@ if(isset($connection) && is_resource($connection)) {
 				} else if (array_key_exists ("arg", $_REQUEST)) {
 					$configuration[$_REQUEST["command"]] = $_REQUEST["arg"];
 				}
+				$command_successful = true;
 			} else {
 				$command = $_REQUEST["command"];
 				if(array_key_exists("arg", $_REQUEST) && strlen($_REQUEST["arg"])>0) $command.=" \"".$_REQUEST["arg"]."\"";
