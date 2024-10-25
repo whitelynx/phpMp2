@@ -295,58 +295,72 @@ function format_song_title($format, $songinfo, $number = null, $strict = false) 
 	$tags = explode("[", $output);
 	if($tags) {
 		foreach($tags as $key => $tag_raw) {
-			$tag = substr($tag_raw, 0, strpos($tag_raw, "]"));
-			if(strlen($tag) > 0) {
+			$tag_list = substr($tag_raw, 0, strpos($tag_raw, "]"));
+			if(strlen($tag_list) > 0) {
 				$replace = null;
-				if ($tag == "Number") {
-					if($number != null) {
-						$replace = $number;
-					} else {
-						$replace = "";
-					}
-				} else if (array_key_exists ($tag, $songinfo)) {
-					switch($tag) {
-					case "Title":
-						$replace = htmlspecialchars($songinfo[$tag]);
+				foreach(explode("|", $tag_list) as $key => $tag) {
+					$replace = get_songinfo_tag($tag, $songinfo, $number);
+					if($replace !== null)
 						break;
-					case "Time":
-						$replace = format_time ($songinfo[$tag]);
-						break;
-					case "directory":
-					case "playlist":
-					case "file":
-						$replace = htmlspecialchars ($songinfo[$tag]);
-						if ($configuration["filenames_strip_directory"] == true)
-							$replace = basename ($replace);
-						if ($configuration["filenames_replace_underscores"] == true)
-							$replace = str_replace ('_',' ', $replace);
-						break;
-					default:
-						$replace = htmlspecialchars($songinfo[$tag]);
-					}
-				} else if (substr ($tag, -7) == "literal") {
-					$replace = htmlspecialchars ($songinfo[substr ($tag, 0, -7)]);
-				} else if ($tag == "Titlefile") {
-					if (array_key_exists ("Title", $songinfo)) {
-						$replace = htmlspecialchars($songinfo["Title"]);
-					} else {
-						$replace = htmlspecialchars ($songinfo["file"]);
-						if ($configuration["filenames_strip_directory"] == true)
-							$replace = basename ($replace);
-						if ($configuration["filenames_replace_underscores"] == true)
-							$replace = str_replace ('_',' ', $replace);
-					}
 				}
 				if($replace !== null)
-					$output = str_replace("[".$tag."]", $replace, $output);
+					$output = str_replace("[".$tag_list."]", $replace, $output);
 				else if ($strict == true)
 					return false;
 				else
-					$output = str_replace ("[".$tag."]", $configuration["unknown_string"], $output);
+					$output = str_replace ("[".$tag_list."]", $configuration["unknown_string"], $output);
 			}
 		}
 	}
 	return $output;
+}
+
+// Get the data for a given tag from the given $songinfo.
+function get_songinfo_tag($tag, $songinfo, $number = null) {
+	global $configuration;
+	if ($tag == "Number") {
+		if($number != null) {
+			return $number;
+		} else {
+			return "";
+		}
+	} else if (array_key_exists ($tag, $songinfo)) {
+		switch($tag) {
+		case "Title":
+			return htmlspecialchars($songinfo[$tag]);
+		case "Time":
+			return format_time ($songinfo[$tag]);
+		case "directory":
+		case "playlist":
+		case "file":
+			$replace = htmlspecialchars ($songinfo[$tag]);
+			if ($configuration["filenames_strip_directory"] == true)
+				$replace = basename ($replace);
+			if ($configuration["filenames_replace_underscores"] == true)
+				$replace = str_replace ('_',' ', $replace);
+			return $replace;
+		default:
+			return htmlspecialchars($songinfo[$tag]);
+		}
+	} else if (substr ($tag, -7) == "literal") {
+		$base_tag = substr ($tag, 0, -7);
+		if (array_key_exists ($base_tag, $songinfo)) {
+			return htmlspecialchars ($songinfo[$base_tag]);
+		}
+		return null;
+	} else if ($tag == "Titlefile") {
+		if (array_key_exists ("Title", $songinfo)) {
+			return htmlspecialchars($songinfo["Title"]);
+		} else {
+			$replace = htmlspecialchars ($songinfo["file"]);
+			if ($configuration["filenames_strip_directory"] == true)
+				$replace = basename ($replace);
+			if ($configuration["filenames_replace_underscores"] == true)
+				$replace = str_replace ('_',' ', $replace);
+			return $replace;
+		}
+	}
+	return null;
 }
 
 //Makes a table of index letters.
