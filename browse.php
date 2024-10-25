@@ -4,14 +4,15 @@ if (!array_key_exists ("browser", $configuration))
 switch ($configuration["browser"]) {
 case "directory":
 	echo "<div id=\"directory\">\n";
-	$dirlinks = dir_links ($configuration["directory"], false);
-	$dirs = get_directories ($connection, $configuration["directory"]);
-	create_browser_table ($configuration["columns"]["directories"], $dirs["directory"], "directory", "directories", "Directories in ".$dirlinks, "No directories found in ".$dirlinks, true, array ("command" => "directory", "arg" => $configuration["directory"]), true, null, null, null, null, true, array ("directory"));
+	$dir = array_key_exists("directory", $configuration) ? $configuration["directory"] : null;
+	$dirlinks = dir_links ($dir, false);
+	$dirs = get_directories ($connection, $dir);
+	create_browser_table ($configuration["columns"]["directories"], $dirs["directory"], "directory", "directories", "Directories in ".$dirlinks, "No directories found in ".$dirlinks, true, array ("command" => "directory", "arg" => $dir), true, null, null, null, null, true, array ("directory"));
 	echo "</div>\n<div id=\"files\">\n";
-	$files = get_files ($connection, "directory", $configuration["directory"]);
-	create_browser_table ($configuration["columns"]["files"], $files["file"], "file", "files", "Files in ".$dirlinks, "No files found in ".$dirlinks, true, array ("command" => "directory", "arg" => $configuration["directory"]), true, null, null, null, null, true);
+	$files = get_files ($connection, "directory", $dir);
+	create_browser_table ($configuration["columns"]["files"], $files["file"], "file", "files", "Files in ".$dirlinks, "No files found in ".$dirlinks, true, array ("command" => "directory", "arg" => $dir), true, null, null, null, null, true);
 	echo "</div>\n<div id=\"playlists\">\n";
-	$pls = get_playlists ($connection, $configuration["directory"]);
+	$pls = get_playlists ($connection, $dir);
 	create_browser_table ($configuration["columns"]["playlists"], $pls["playlist"], "playlist", "playlists", "Playlists in ".$dirlinks, "No playlists found in ".$dirlinks, true, array (), false, null, null, null, null, true);
 	echo "</div>\n";
 	include("streams.php");
@@ -21,7 +22,8 @@ case "search":
 	if (array_key_exists ("tag", $configuration) && array_key_exists ("arg", $configuration)) {
 		echo "<div id=\"files\">\n";
 		$files = get_files ($connection, $configuration["tag"], $configuration["arg"], false);
-		create_browser_table ($configuration["columns"]["files"], $files["file"], "file", "files", "Files with ".$configuration["tag"]." \"".$configuration["arg"]."\"", "No files found!", true, array ("command" => "directory", "arg" => $configuration["directory"]), true, null, null, null, null, true);
+		$dir = array_key_exists("directory", $configuration) ? $configuration["directory"] : null;
+		create_browser_table ($configuration["columns"]["files"], $files["file"], "file", "files", "Files with ".$configuration["tag"]." \"".$configuration["arg"]."\"", "No files found!", true, array ("command" => "directory", "arg" => $dir), true, null, null, null, null, true);
 		echo "</div>\n";
 	}
 	break;
