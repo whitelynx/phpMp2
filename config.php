@@ -1,7 +1,7 @@
 <?php
 $configuration = array(
 // NEED TO SET THESE!
-	"mpd_host" => "127.0.0.1", //The host where mpd is being run.
+	"mpd_host" => "mpd-1", //The host where mpd is being run.
 	"mpd_port" => 6600, //The port which mpd is listening on.
 
 // GENERAL

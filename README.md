@@ -54,8 +54,6 @@ mkdir -p mpd-data/{config,music,playlists}
 
 You can place media files in the `mpd-data/music` directory.
 
-Edit `config.php`, and change the `mpd_host` setting to `mpd-1`.
-
 Next, bring up the Docker Compose stack:
 ```bash
 docker compose up
@@ -83,8 +81,6 @@ docker run --rm \
     -p 6680:6680 \
     wernight/mopidy mopidy local scan
 ```
-
-Edit `config.php`, and change the `mpd_host` setting to `mpd-1`.
 
 Next, bring up the Docker Compose stack:
 ```bash
