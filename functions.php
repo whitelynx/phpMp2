@@ -458,17 +458,21 @@ function do_mpd_browse_command ($connection, $command, $arguments, $filter_group
 		} else {
 			fputs($connection, $command." \"".$arg."\"\n");
 		}
+		$first_tag = null;
 		while(!feof($connection)) {
 			$var = parse_mpd_var(fgets($connection, 1024));
 			if(isset($var)){
+				if($first_tag === null) {
+					$first_tag = $var[0];
+				}
 				if($var === true) {
 					if (count($retarr) == 0)
 						return true;
 					else
 						break;
 				}
-				if (substr ($var[0], 0, 1) == strtolower (substr ($var[0], 0, 1))) {
-					//tag's first letter is lowercase; this is the start of a new response group.
+				if($var[0] == $first_tag) {
+					//tag is the same as the first received tag; this is the start of a new response group.
 					$groupname = $var[0];
 					$itemname = $var[1];
 					if ($filter_group == "" || $groupname == $filter_group) {
@@ -482,7 +486,7 @@ function do_mpd_browse_command ($connection, $command, $arguments, $filter_group
 						$skip_group = true;
 					}
 				} else if ($skip_group != true) {
-					//tag's first letter is uppercase; add this to the current group.
+					//add this to the current response group.
 					$retarr[$groupname][$itemname][($var[0])] = $var[1];
 				}
 			}
@@ -622,9 +626,9 @@ function create_browser_table ($columns, $data, $dataname, $name, $title, $nonef
 		foreach ($data as $dbname => $dblock) {
 			if ($startindex == null || ($startindex <= $rowcount && $rowcount <= $stopindex)) {
 				if (is_array ($dblock)) {
-					$dblockmerged = array_merge (array ($dataname => $dbname), $dblock);
+					$dblockmerged = array_merge (array ($dataname => $dbname, "index" => $rowcount), $dblock);
 				} else {
-					$dblockmerged = array ($dataname => $dblock);
+					$dblockmerged = array ($dataname => $dblock, "index" => $rowcount);
 				}
 				echo "<tr";
 				if ($hilighttag != null && $dblockmerged[$hilighttag] == $hilightmatch)
