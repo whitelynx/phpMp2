@@ -585,8 +585,10 @@ function create_browser_table ($columns, $data, $dataname, $name, $title, $nonef
 			$sorttmp = $configuration["sort"];
 			if (is_array ($customsort))
 				$configuration["sort"] = $customsort;
+			else if ($customsort !== null)
+				$configuration["sort"] = array($customsort);
 			else
-				array_push ($configuration["sort"], $dataname);
+				array_merge (array($dataname), $configuration["sort"]);
 			uasort ($data, 'sort_song');
 			$configuration["sort"] = $sorttmp;
 		}
