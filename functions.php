@@ -443,8 +443,18 @@ function get_songinfo_first ($info, $sort_history, $depth) {
 	}
 }
 
+//Tags which signal the start of a new group in the response, grouped by command.
+$starting_tags_by_command = array (
+	"lsinfo" => array ("file", "directory", "playlist"),
+);
+
 //Performs an MPD command and parses the output as a browsing response.
 function do_mpd_browse_command ($connection, $command, $arguments, $filter_group = "") {
+	global $starting_tags_by_command;
+	$starting_tags = null;
+	if($starting_tags === null && array_key_exists($command, $starting_tags_by_command)) {
+		$starting_tags = $starting_tags_by_command[$command];
+	}
 	$retarr = array();
 	if (is_array ($arguments)) {
 		$args = $arguments;
@@ -458,12 +468,11 @@ function do_mpd_browse_command ($connection, $command, $arguments, $filter_group
 		} else {
 			fputs($connection, $command." \"".$arg."\"\n");
 		}
-		$first_tag = null;
 		while(!feof($connection)) {
 			$var = parse_mpd_var(fgets($connection, 1024));
 			if(isset($var)){
-				if($first_tag === null) {
-					$first_tag = $var[0];
+				if($starting_tags === null) {
+					$starting_tags = array ($var[0]);
 				}
 				if($var === true) {
 					if (count($retarr) == 0)
@@ -471,8 +480,8 @@ function do_mpd_browse_command ($connection, $command, $arguments, $filter_group
 					else
 						break;
 				}
-				if($var[0] == $first_tag) {
-					//tag is the same as the first received tag; this is the start of a new response group.
+				if(in_array($var[0], $starting_tags)) {
+					//tag is a starting tag; this is the start of a new response group.
 					$groupname = $var[0];
 					$itemname = $var[1];
 					if ($filter_group == "" || $groupname == $filter_group) {
