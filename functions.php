@@ -520,6 +520,14 @@ function convert_mpd_return ($data, $dataname) {
 	return $retarr;
 }
 
+//Ensure that we return an array - if we received a `true` response, return an empty array.
+function ensure_array($value, $name) {
+	if ($value === true) {
+		return array ($name => array ());
+	}
+	return $value;
+}
+
 //Returns an array of files matching the given search within the given field.
 // Valid values for $field:
 //  "directory" - return all files within the directory given in $search.
@@ -531,33 +539,32 @@ function convert_mpd_return ($data, $dataname) {
 function get_files ($connection, $field, $search, $exact = true) {
 	switch ($field) {
 	case "directory":
-		return do_mpd_browse_command ($connection, "lsinfo", $search, "file");
+		return ensure_array(do_mpd_browse_command ($connection, "lsinfo", $search, "file"), "file");
 	case "files":
 	case "filename":
 		$filenames = explode (",", $search);
-		$files = array ();
-		return do_mpd_browse_command ($connection, "search filename", $filenames, "file");
+		return ensure_array(do_mpd_browse_command ($connection, "search filename", $filenames, "file"), "file");
 	case "artist":
 	case "album":
 	case "title":
 	case "genre":
 		if ($exact == true) {
-			return do_mpd_browse_command ($connection, "find ".$field, $search, "file");
+			return ensure_array(do_mpd_browse_command ($connection, "find ".$field, $search, "file"), "file");
 		}
-		return do_mpd_browse_command ($connection, "search ".$field, $search, "file");
+		return ensure_array(do_mpd_browse_command ($connection, "search ".$field, $search, "file"), "file");
 	default:
-		return $files;
+		return array ();
 	}
 }
 
 //Returns a list of subdirectories of the given directory. The directory defaults to the root of the database.
 function get_directories ($connection, $parent = "") {
-	return do_mpd_browse_command ($connection, "lsinfo", $parent, "directory");
+	return ensure_array(do_mpd_browse_command ($connection, "lsinfo", $parent, "directory"), "directory");
 }
 
 //Returns an array of available playlists in the given directory. The directory defaults to the root of the database.
 function get_playlists ($connection, $parent = "") {
-	return do_mpd_browse_command ($connection, "lsinfo", $parent, "playlist");
+	return ensure_array(do_mpd_browse_command ($connection, "lsinfo", $parent, "playlist"), "playlist");
 }
 
 //Returns an array of instances of the given tag in the database.
@@ -574,7 +581,7 @@ function get_albums ($connection, $artist = "") {
 
 //Returns an array containing all the songs in the current playlist.
 function get_playlist ($connection) {
-	return do_mpd_browse_command ($connection, "playlistinfo", null, "file");
+	return ensure_array(do_mpd_browse_command ($connection, "playlistinfo", null, "file"), "file");
 }
 
 //Creates a table for the browser based on a given column definition and dataset.
