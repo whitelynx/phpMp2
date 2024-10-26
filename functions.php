@@ -615,7 +615,7 @@ function create_browser_table ($columns, $data, $dataname, $name, $title, $nonef
 
 		echo "<table cellspacing=\"0\">\n<thead><tr>";
 		foreach ($columns as $coltitle => $coldef) {
-			echo "<td".($coldef["shrink"] == true ? " style=\"width: ".strlen ($coltitle)."em\"" : "").">";
+			echo "<td".(array_key_exists ("shrink", $coldef) && $coldef["shrink"] ? " style=\"width: ".strlen ($coltitle)."em\"" : "").">";
 			if (array_key_exists ("sort", $coldef))
 				make_link ("", $name, $coltitle, array ("sort" => $coldef["sort"]));
 			else
