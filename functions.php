@@ -485,7 +485,8 @@ function do_mpd_browse_command ($connection, $command, $arguments, $filter_group
 					} else {
 						$skip_group = true;
 					}
-				} else if ($skip_group != true) {
+				}
+				if ($skip_group != true) {
 					//add this to the current response group.
 					$retarr[$groupname][$itemname][($var[0])] = $var[1];
 				}
